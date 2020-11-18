@@ -1,0 +1,20 @@
+h2 
+{
+    text-align: center;
+    margin: 20px;
+    
+}
+span.numecul 
+{
+    color: pink;
+
+}
+
+canvas
+{ 
+    width: 600px;
+    height: 400px;
+    border: dotted black;
+    border-width: 1px;
+    
+}
