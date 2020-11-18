@@ -1,0 +1,15 @@
+
+p
+{
+    background-color: hsla(182, 100%, 50%, 0.911);
+
+}
+div {
+    border: 1px solid pink;
+}
+canvas{
+    width:"400px" ;
+    height:"300px";
+     border: dotted palevioletred;
+     margin: 10px;
+}
