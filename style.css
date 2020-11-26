@@ -8,8 +8,7 @@ div {
     border: 1px solid pink;
 }
 canvas{
-    width:"400px" ;
-    height:"300px";
+  
      border: dotted palevioletred;
      margin: 10px;
 }
