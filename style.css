@@ -10,5 +10,11 @@ div {
 canvas{
   
      border: dotted palevioletred;
-     margin: 10px;
+}
+button
+{
+    background-color: pink;
+    color: purple;
+    margin: 10px;
+    
 }

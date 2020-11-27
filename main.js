@@ -4,7 +4,8 @@ const canvas = document.getElementById("canvasId");
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext('2d');
 
-
+var width = canvas.width;
+var height = canvas.height;
 
  ctx.fillStyle = "pink";
  ctx.fillRect(280, 20, 40, 20);
@@ -12,9 +13,12 @@ const ctx = canvas.getContext('2d');
  const betty = new Image();
 betty.src = 'assets/betty.png';
  const BETTY_WIDTH= 45;
- const BETTY_HEIGHT =50;
+ const BETTY_HEIGHT =45;
  let bettyX = 100;
  let bettyY = 100;
+
+
+
 
 betty.onload = () => {
      ctx.drawImage(betty, 0 * BETTY_WIDTH , 0 * BETTY_HEIGHT, BETTY_WIDTH, BETTY_HEIGHT, 100, 100, BETTY_WIDTH, BETTY_HEIGHT )
@@ -23,7 +27,7 @@ betty.onload = () => {
  const dante = new Image();
  dante.src = 'assets/dante.png';
  const DANTE_WIDTH= 45;
- const DANTE_HEIGHT =50;
+ const DANTE_HEIGHT =45;
  let danteX = 0;
  let danteY = 0;
 
@@ -36,23 +40,38 @@ dante.onload = () => {
      switch(event.key)
      {
          case 'ArrowUp':
-             {
+             {  if( bettyY - 10 >= 0 )
+                {
                  bettyY -= 10;
+                 
+                }
                  break;
              }
         case 'ArrowDown':
              {
+                if(bettyY + 10 < height - BETTY_HEIGHT)
+                {
+
                  bettyY += 10;
+                }
                  break;
              }
         case 'ArrowLeft':
                 {
-                    bettyX -= 10;
+                    if (bettyX - 10 >0)
+                    {
+                         bettyX -= 10;
+                    }
+                   
                     break;
                 }
         case 'ArrowRight':
                     {
-                        bettyX += 10;
+                        if (bettyX + 10 <  width - BETTY_WIDTH)
+                        {
+                            bettyX += 10;
+                        }
+                        
                         break;
                     }
      }
@@ -67,22 +86,36 @@ dante.onload = () => {
     {
         case 'w':
             {
-                danteY -= 10;
+                if (danteY - 10 > 0)
+                {
+                    danteY -= 10;
+                }
+                
                 break;
             }
        case 's':
             {
+                if (danteY + 10 < height - DANTE_HEIGHT)
+                {
+
                 danteY += 10;
+                }
                 break;
             }
        case 'a':
                {
+                if (danteX - 10 > 0)
+                {
                    danteX -= 10;
-                   break;
+                   }                   
+                break;
                }
        case 'd':
                    {
+                    if (danteX + 10 < width - DANTE_WIDTH)
+                    {
                        danteX += 10;
+                    }
                        break;
                    }
     }
