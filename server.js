@@ -3,7 +3,8 @@
  const http = require ('http').createServer(app);
  const io = require('socket.io')(http);
 
- const PLAYER_DIM = 32;
+ const Game = require('./models/game');
+
  const usersn = 0;
  const exist = 0 ;
 
@@ -72,52 +73,52 @@ io.on('connection', function(socket) {
 
 })
 
-class Player {
-    constructor() {
-      this.x = 80;
-      this.y = 127;
-      this.dx = 0;
-      this.dy = 0;
-      this.imageId = 'space-ranger';
-      this.direction = 'down';
-      this.imageStartPoints = {
-        right: [ 193, 225 ],
-        left: [131, 161],
-        down: [65, 98],
-        up: [0, 33]
-      };
-    }
+// class Player {
+//     constructor() {
+//       this.x = 80;
+//       this.y = 127;
+//       this.dx = 0;
+//       this.dy = 0;
+//       this.imageId = 'space-ranger';
+//       this.direction = 'down';
+//       this.imageStartPoints = {
+//         right: [ 193, 225 ],
+//         left: [131, 161],
+//         down: [65, 98],
+//         up: [0, 33]
+//       };
+//     }
   
-    forDraw() {
-      return {
-        imageId: this.imageId,
-        drawImageParameters: [
-          this.imageStartPoints[this.direction][0],
-          0,
-          PLAYER_DIM,
-          PLAYER_DIM,
-          this.x, //unde se afla acum dx si dy
-          this.y,
-          PLAYER_DIM,
-          PLAYER_DIM
-        ]
-      }
-    }
-  }
+//     forDraw() {
+//       return {
+//         imageId: this.imageId,
+//         drawImageParameters: [
+//           this.imageStartPoints[this.direction][0],
+//           0,
+//           PLAYER_DIM,
+//           PLAYER_DIM,
+//           this.x, //unde se afla acum dx si dy
+//           this.y,
+//           PLAYER_DIM,
+//           PLAYER_DIM
+//         ]
+//       }
+//     }
+//   }
 
-class Game{
-    constructor(options){
-        this.id = options.id
-        this.players = options.players
-        this.start();
-    }
-    start(){
-        const that = this; //pt ca era this id mai jos si nu se ref la instanta jocului, ca nu e un arrow function
-        // aceasta a fost asignata aici si o sa se ref mereu la instanta jocului
-        setInterval(function () {gameLoop(that.id)}, 1000/60); //fct care se repeta pe sec de x ori, 60 refresh pe sec
-    //setinterv primeste ca prim param o fct, de aia punem fct anonima in int careia apelam fct gloop
-    }
-}
+// class Game{
+//     constructor(options){
+//         this.id = options.id
+//         this.players = options.players
+//         this.start();
+//     }
+//     start(){
+//         const that = this; //pt ca era this id mai jos si nu se ref la instanta jocului, ca nu e un arrow function
+//         // aceasta a fost asignata aici si o sa se ref mereu la instanta jocului
+//         setInterval(function () {gameLoop(that.id)}, 1000/60); //fct care se repeta pe sec de x ori, 60 refresh pe sec
+//     //setinterv primeste ca prim param o fct, de aia punem fct anonima in int careia apelam fct gloop
+//     }
+// }
 
 function gameLoop(id){ //pt a tr constat catre utiliz date, gen unde se afla playeru, cate diamante sunt etc
   const objectsForDraw = [];
@@ -129,6 +130,8 @@ function gameLoop(id){ //pt a tr constat catre utiliz date, gen unde se afla pla
 
 const chatUsers = {};
 const games = {};
+const players = {};
 
+module.exports.gameLoop = gameLoop;
 
 
