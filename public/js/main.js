@@ -144,7 +144,7 @@ document.getElementById('user-name-missing').classList.remove('display-none');
 var usersn = 0;
 var exist = 0;
 
-socket.on('joined-chat', function() {
+socket.on('joined-chat', function(userName) {
     console.log('You joined chat');
     // usersn += 1;
     // exist = 1;
@@ -153,9 +153,22 @@ socket.on('joined-chat', function() {
 
     document.getElementById('menu').classList.add('display-none');
     document.getElementById('chat-container').classList.remove('display-none');
+    const messageC = document.getElementById('chat-messages');
+    const messageE = document.createElement('p');
+    
+    messageE.innerHTML = userName;
+    messageC.appendChild(messageE);
     
 })
 
+// socket.on('show', function(users){
+//     const s = document.getElementById('showUsersN');
+//     const show = document.createElement('p');
+    
+//     show.innerHTML = users + ' users online.';
+//     console.log(users);
+//     s.appendChild(show);
+//     })
 // socket.on('showUsers', function(usersn){
     
 //     if ( exist == 0){
@@ -177,7 +190,7 @@ document.getElementById("send-message-button").addEventListener('click', functio
     document.getElementById('message').value = '';
 })
 
-socket.on('new-message', function(message) {
+socket.on('new-message', function(options) {
     const inputcolor = document.getElementById('pick-color');
     const colorcode = inputcolor.value;
     console.log(colorcode);
@@ -185,22 +198,40 @@ socket.on('new-message', function(message) {
     const messagesContainer = document.getElementById('chat-messages');
     const messageElement = document.createElement('p');
     const mess = document.createElement('span');
-    mess.innerHTML = message;
-    console.log(message);
+    messageElement.innerHTML = options.user + ': ';
+    mess.innerHTML = options.message;
+    
     mess.style.color = colorcode;
    
+    messageElement.appendChild(mess);
     messagesContainer.appendChild(messageElement);
-    messagesContainer.appendChild(mess);
 })
 document.getElementById('leave-chat-button').addEventListener('click', function() {
     socket.emit('leave-chat');
 })
 
+socket.on('left-message', function(userName){
+const l = document.getElementById('chat-messages');
+const messagel = document.createElement('p');
+
+messagel.innerHTML = userName + ' left chat.';
+console.log(userName);
+l.appendChild(messagel);
+})
+
+document.getElementById('leave-chat-button').addEventListener('click', function() {
+     
+})
+
+
 socket.on('menu', function() {
     console.log('You left chat');
+
     document.getElementById('menu').classList.remove('display-none');
     document.getElementById('chat-container').classList.add('display-none');
 })
+
+
 
 document.getElementById("create-game-button").addEventListener('click', function() {
     const input = document.getElementById("game-name-input");
@@ -230,7 +261,7 @@ document.getElementById("create-game-button").addEventListener('click', function
 
     })
     // tema 3
-    var counter = 0 ;
+   var counter = 0;
     var c = 0;
     
     
@@ -243,12 +274,13 @@ document.getElementById("create-game-button").addEventListener('click', function
     
     socket.on('new-counter', function(counter) {
         
-        if (c == 0){
+        if (counter == 1){
         const counterContainer = document.getElementById('show-counter');
         const showCounter = document.createElement('p');
         showCounter.innerHTML = 'The actual counter value is: ' + counter;
         counterContainer.appendChild(showCounter); 
         } else{
+
             document.getElementById('show-counter').innerHTML = 'The actual counter value is:' + counter;
         }
         

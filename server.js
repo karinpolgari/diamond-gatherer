@@ -7,6 +7,7 @@
  const PinkLady = require('./models/pink_lady');
  const Game = require('./models/game');
 
+
 //  const usersn = 0;
 //  const exist = 0 ;
 
@@ -34,11 +35,18 @@ io.on('connection', function(socket) {
         console.log('[USER JOINED CHAT]', socket.id, userName);
         chatUsers[socket.id] = userName;
         socket.join('chat');
-        socket.emit('joined-chat');
+        // socket.emit('joined-chat'); 
+        // console.log(chatUsers);
+        // chatUsers.update();
+        // users.update();
+        io.to('chat').emit('joined-chat', `${chatUsers[socket.id]} joined chat.`);
+        // io.to('chat').emit('show', users );
+
+
     })
     socket.on('send-message', function (message) {
         console.log('[USER SENT MESSAGE]', message);
-                io.to('chat').emit('new-message', `${chatUsers[socket.id]}: ${message}`);
+                io.to('chat').emit('new-message', {user: chatUsers[socket.id], message: message});
     })
     // socket.on('chcolor', function(colorcode){
     //   console.log('[USER COLOR IS: ]' , colorcode);
@@ -47,11 +55,20 @@ io.on('connection', function(socket) {
     //   io.to('chat').emit('new-style', ` ${message}` )
     //     })
 
+    // socket.on('mes', function(){
+    //   chatUsers[socket.id] = userName;
+    //   
+    // })
+
     socket.on('leave-chat', function() {
         console.log('[USER LEFT CHAT]', socket.id);
+         u = chatUsers[socket.id];
         delete chatUsers[socket.id]; //sterge cheia respectiva
+        
+        io.to('chat').emit('left-message', u);
         socket.leave('chat');
         socket.emit('menu');
+        
     })
 
     
@@ -111,7 +128,7 @@ io.on('connection', function(socket) {
       if (players[socket.id]) {
         const gameId = players[socket.id].gameId;
         const game = games[gameId];
-        const playersToRemoveIds = game.players.map(function (player) { //map trece prin fiecare element si il modif, dar ramane neschimbat,doar afi
+        const playersToRemoveIds = game.players(function (player) { //map trece prin fiecare element si il modif, dar ramane neschimbat,doar afi
           return player.socketId;
         })
         clearInterval(game.interval);
@@ -138,5 +155,6 @@ io.on('connection', function(socket) {
   const chatUsers = {};
   const games = {};
   const players = {};
+  // const users = chatUsers.length;
 
   module.exports.gameLoop = gameLoop;
