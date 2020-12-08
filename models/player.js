@@ -10,7 +10,7 @@ const PLAYER_DIM = {
   
   class Player {
     constructor(options) {
-      this.dx = 0;
+      this.dx = 0; //dx si dy viteza pe axa ox si oy
       this.dy = 0;
       this.step = 0;
       this.direction = 'down';
@@ -22,7 +22,7 @@ const PLAYER_DIM = {
       return {
         imageId: this.imageId,
         drawImageParameters: [
-          this.imageStartPoints[this.direction][this.step],
+          this.imageStartPoints[this.direction][this.step], //de unde incepe canvas sa decupeze img
           0,
           PLAYER_DIM.width,
           PLAYER_DIM.height,
@@ -55,8 +55,8 @@ const PLAYER_DIM = {
     move() {
       const newX = this.x + this.dx;
       if (newX != this.x && newX > 0 && (newX + PLAYER_DIM.width) < MAP.width) {
-        this.x = this.x + this.dx;
-        this.step = Math.floor(this.x / PLAYER_DIM.width) % 2;
+        this.x = this.x + this.dx; //creste cu viteza
+        this.step = Math.floor(this.x / PLAYER_DIM.width) % 2;//m fl pt a rotunji si modulo 2 pt a obt doar 0 sau 1, care va fi prima sau a 2a img pt fiecare directie
       }
   
       const newY = this.y + this.dy;
@@ -70,5 +70,5 @@ const PLAYER_DIM = {
       this[axis] = 0;
     }
   }
-  
+
   module.exports = Player;

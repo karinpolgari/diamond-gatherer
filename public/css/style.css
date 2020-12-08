@@ -46,18 +46,25 @@ button
     border: dotted pink;
 }
 
-#counter-button{
-    background-color: pink;
-    color: purple;
+button {
+    background-color:#e7c7c7;
+    color: rgb(143, 97, 104);
     margin: 10px;
     font-size: 14px;
-    border-radius: 10px;
+    border-radius: 4px;
+    border: none;
   
 
 }
+
 #select-button {
     background-color:pink;
     color: white;
 
   }
-  
+  .game-element {
+    border: 1px solid black;
+    text-align: center;
+    padding: 10px;
+    margin: 10px;
+}

@@ -14,8 +14,8 @@ class Game {
   }
 
   update() {
-    this.players.forEach(function (player) {
-      player.move();
+    this.players.forEach(function (player) { //this.pl sunt pl din jocul la care ne referim
+      player.move(); //pt fiecare pl apeleaza instanta move
     })
   }
 }

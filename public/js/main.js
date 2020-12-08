@@ -146,31 +146,29 @@ var exist = 0;
 
 socket.on('joined-chat', function() {
     console.log('You joined chat');
-    usersn += 1;
-    exist = 1;
-    console.log(exist);
-    console.log(usersn);
+    // usersn += 1;
+    // exist = 1;
+    // console.log(exist);
+    // console.log(usersn);
 
-    document.getElementById('join-chat').classList.add('display-none');
+    document.getElementById('menu').classList.add('display-none');
     document.getElementById('chat-container').classList.remove('display-none');
     
-    
-
 })
 
-socket.on('showUsers', function(usersn){
+// socket.on('showUsers', function(usersn){
     
-    if ( exist == 0){
-    const usersContainer = document.getElementById('showUsersN');
-    const show = document.createElement('p');
-    show.innerHTML ='Number of online users:' + usersn;
+//     if ( exist == 0){
+//     const usersContainer = document.getElementById('showUsersN');
+//     const show = document.createElement('p');
+//     show.innerHTML ='Number of online users:' + usersn;
     
-    usersContainer.appendChild(show);
-    }else{
-        document.getElementById('showUsersN').innerHTML = 'Number of online users:' + usersn;
+//     usersContainer.appendChild(show);
+//     }else{
+//         document.getElementById('showUsersN').innerHTML = 'Number of online users:' + usersn;
 
-    }
-})
+//     }
+// })
 
 document.getElementById("send-message-button").addEventListener('click', function() {
     const input = document.getElementById("message");
@@ -183,65 +181,24 @@ socket.on('new-message', function(message) {
     const inputcolor = document.getElementById('pick-color');
     const colorcode = inputcolor.value;
     console.log(colorcode);
-    // socket.emit('chcolor', colorcode);
     
     const messagesContainer = document.getElementById('chat-messages');
     const messageElement = document.createElement('p');
-    messageElement.innerHTML = message;
-    
-    messageElement.style.color = colorcode;
+    const mess = document.createElement('span');
+    mess.innerHTML = message;
+    console.log(message);
+    mess.style.color = colorcode;
+   
     messagesContainer.appendChild(messageElement);
+    messagesContainer.appendChild(mess);
 })
-// socket.on('new-style', function (colorcode){
-//     message.style.color = colorcode;
-
-
-// })
-    
-    // console.log(message);
-    // var m= message;
-    // console.log(m);
-    // var chars = m.split('');
-    // console.log(chars);
-    // var lm = chars.length;
-    // console.log(lm);
-    // var j=0;
-    
-    // for ( var i=0; i < lm ;i++)
-    // { 
-    //     console.log(i + 'i este');
-    //     j++;
-    //     if (chars[i]===':'){
-    //        break;
-    //     }
-       
-    //     console.log(j);
-        
-    // }
-    // chars.splice(0,j);
-    // chars.style.color = colorcode;
-    
-    
-    
-    
-
-    // const inputcolor = document.getElementById('pick-color');
-    // const colorcode = inputcolor.value;
-    // console.log(colorcode);
-    // const mtext = document.getElementById('message').innerHTML;
-    // console.log(mtext);
-    // inputcolor.addEventListener('change', function () {
-    //     mtext.style.color = this.value;
-    // })
-
-
 document.getElementById('leave-chat-button').addEventListener('click', function() {
     socket.emit('leave-chat');
 })
 
 socket.on('menu', function() {
     console.log('You left chat');
-    document.getElementById('join-chat').classList.remove('display-none');
+    document.getElementById('menu').classList.remove('display-none');
     document.getElementById('chat-container').classList.add('display-none');
 })
 
@@ -260,8 +217,7 @@ document.getElementById("create-game-button").addEventListener('click', function
     })
 
     socket.on('game-loop', function(objectsForDraw) {
-        document.getElementById('join-chat').classList.add('display-none');
-        document.getElementById('create-game-container').classList.add('display-none');
+        document.getElementById('menu').classList.add('display-none');
         document.getElementById('game-container').classList.remove('display-none');
         ctx.drawImage(document.getElementById('map-image'), 0, 0); // desenata de 60 ori pe sec
 
@@ -275,21 +231,22 @@ document.getElementById("create-game-button").addEventListener('click', function
     })
     // tema 3
     var counter = 0 ;
-    var click = 0;
+    var c = 0;
+    
     
     document.getElementById("counter-button").addEventListener('click', function() {
 
         counter += 1;
-        click = 1;
+        c = 1;
         socket.emit('count', counter);
     })
     
     socket.on('new-counter', function(counter) {
         
-        if (click == 0){
+        if (c == 0){
         const counterContainer = document.getElementById('show-counter');
         const showCounter = document.createElement('p');
-        showCounter.innerHTML = 'The actual counter value is:' + counter;
+        showCounter.innerHTML = 'The actual counter value is: ' + counter;
         counterContainer.appendChild(showCounter); 
         } else{
             document.getElementById('show-counter').innerHTML = 'The actual counter value is:' + counter;
@@ -297,21 +254,114 @@ document.getElementById("create-game-button").addEventListener('click', function
         
     })
 
-
-
-
-    // usersn += 1;
-    // exist = 1;
-    // if ( exist = 0){
-    // const usersContainer = document.getElementById('showUsersN');
-    // const show = document.createElement('p');
-    // show.innerHTML ='Number of online users:' + usersn;
+    document.addEventListener("keydown", function(event) {
+        switch(event.key) {
+            case 'ArrowUp':
+                socket.emit('start-moving-player', 'up'); //tr catre backend
+                break;
+            case 'ArrowDown': {
+                socket.emit('start-moving-player', 'down');
+                break;
+            }
+            case 'ArrowLeft': {
+                socket.emit('start-moving-player', 'left');
+                break;
+            }
+            case 'ArrowRight': {
+                socket.emit('start-moving-player', 'right');
+                break;
+            }
+        }
+    })
     
-    // usersContainer.appendChild(show);
-    // }else{
-    //     document.getElementById('showUsersN').innerHTML = 'Number of online users:' + usersn;
+    document.addEventListener('keyup', function(event) {
+        switch(event.key) {
+            case 'ArrowUp': //nu punem break pt ca ambele sunt pe axa Y, indif de tasta vrem sa se opreasca 
+            case 'ArrowDown':
+                socket.emit('stop-moving-player', 'dy');
+                break;
+            case 'ArrowLeft':
+            case 'ArrowRight':
+                socket.emit('stop-moving-player', 'dx');
+                break;
+        }
+    })
+    
+    socket.on('add-game-to-list', function (options) { //opt e obiectul ce contine numele si id ul jocului
+        const gameElementContainer = document.createElement('div');
+        gameElementContainer.classList.add('game-element');
+        gameElementContainer.id = options.gameId;
+    
+        const gameNameElement = document.createElement('p');
+        gameNameElement.innerHTML = options.gameName;
+        const joinGameButton = document.createElement('button');
+        joinGameButton.innerHTML = 'Join Game!';
+    
+        joinGameButton.addEventListener('click', function () {
+            socket.emit('join-game', options.gameId);
+        })
+    
+        gameElementContainer.appendChild(gameNameElement);
+        gameElementContainer.appendChild(joinGameButton);
+    
+        document.getElementById('game-list').appendChild(gameElementContainer);
+    })
+    
+    socket.on('remove-game-from-list', function (gameId) {
+        document.getElementById(gameId).classList.add('display-none');
+    })
+    
+    socket.on('game-over', function (reason) {
+        console.log('Game Over', reason);
+        
+        ctx.font="120px Lucia Console";
+        ctx.fillStyle = "pink";
+        ctx.textAlign = "center";
+        ctx.fillText("Game Over", canvas.width/2, canvas.height/2);
 
+        const container = document.getElementById('home');
+        const elem = document.createElement('button');
+        elem.innerHTML = 'Back to menu';
+
+        container.appendChild(elem);
+
+        elem.addEventListener('click' , function(){
+            document.getElementById('menu').classList.remove('display-none');
+            document.getElementById('game-container').classList.add('display-none');
+            elem.classList.add('display-none');
+
+        })
+    })
+    
+    // socket.on('new-style', function (colorcode){
+    //   message.style.color = colorcode;
+    // })
+    // console.log(message);
+    // var m= message;
+    // console.log(m);
+    // var chars = m.split('');
+    // console.log(chars);
+    // var lm = chars.length;
+    // console.log(lm);
+    // var j=0;
+    
+    // for ( var i=0; i < lm ;i++)
+    // { 
+    //     console.log(i + 'i este');
+    //     j++;
+    //     if (chars[i]===':'){
+    //        break;
+    //     }
+       
+    //     console.log(j);
     // }
-    
-
-    
+    // chars.splice(0,j);
+    // chars.style.color = colorcode;
+    // const inputcolor = document.getElementById('pick-color');
+    // const colorcode = inputcolor.value;
+    // console.log(colorcode);
+    // const mtext = document.getElementById('message').innerHTML;
+    // console.log(mtext);
+    // inputcolor.addEventListener('change', function () {
+    //     mtext.style.color = this.value;
+    // })

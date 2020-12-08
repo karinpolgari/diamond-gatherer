@@ -3,10 +3,12 @@
  const http = require ('http').createServer(app);
  const io = require('socket.io')(http);
 
+ const SpaceRanger = require('./models/space_ranger'); //o const prin care cerem clasa
+ const PinkLady = require('./models/pink_lady');
  const Game = require('./models/game');
 
- const usersn = 0;
- const exist = 0 ;
+//  const usersn = 0;
+//  const exist = 0 ;
 
 
  http.listen(5000, function() {
@@ -21,6 +23,12 @@ app.use(express.static(__dirname + '/public'));
 
 io.on('connection', function(socket) {
     console.log('[SOCKET CONNECTED]' + socket.id);
+    socket.join('menu'); //add la menu chiar cand se con
+    Object.keys(games).forEach(function (gameId) { //ch din game sunt cheile, sa apara toate jocurile create cand se con unul nou 
+      if (games[gameId].players.length === 1) {
+        socket.emit('add-game-to-list', { gameName: games[gameId].name, gameId: gameId })
+      }
+    })
 
     socket.on('join-chat', function(userName){
         console.log('[USER JOINED CHAT]', socket.id, userName);
@@ -46,92 +54,89 @@ io.on('connection', function(socket) {
         socket.emit('menu');
     })
 
-    socket.on('create-game', function(gameName) {
-        console.log('[NEW GAME CREATED]');
-        const gameId = 'game-' + socket.id;
-        const players = [new Player()];
-        const game = new Game({ //tr un param de tip obiect in loc de ex 5 param
-            id: gameId,
-            players: players
-        });
-        games[gameId] = game; // ca sa il putem accesa si in gameloop
-        console.log('User joined' + gameId + ' room');
-        socket.join(gameId);
+    
+  socket.on('create-game', function (gameName) {
+    console.log('[NEW GAME CREATED]');
+    const gameId = 'game-' + socket.id;
+    players[socket.id] = new SpaceRanger({ gameId: gameId, socketId: socket.id });
+    const game = new Game({
+      id: gameId,
+      players: [players[socket.id]],
+      name: gameName
+    });
+    games[gameId] = game;
+    console.log('[User joined ' + gameId + '] room');
+    socket.join(gameId);
+    io.to('menu').emit('add-game-to-list', { gameName: gameName, gameId: gameId })
+  })
 
-    })
+    
     //tema 3
       socket.on('count', function(counter) {
           console.log('[ACTUAL COUNTER IS:]', counter);
-          io.emit('new-counter', `${counter}`);
+          io.to('menu').emit('new-counter', `${counter}`);
       });
 
-      socket.on('users', function(usersn) {
-        console.log('[NO OF ONLINE USERS IS :]', usersn);
-        io.emit('showUsers', `${usersn}`);
-    });
+    //   socket.on('users', function(usersn) {
+    //     console.log('[NO OF ONLINE USERS IS :]', usersn);
+    //     io.emit('showUsers', `${usersn}`);
+    // });
 
-
-})
-
-// class Player {
-//     constructor() {
-//       this.x = 80;
-//       this.y = 127;
-//       this.dx = 0;
-//       this.dy = 0;
-//       this.imageId = 'space-ranger';
-//       this.direction = 'down';
-//       this.imageStartPoints = {
-//         right: [ 193, 225 ],
-//         left: [131, 161],
-//         down: [65, 98],
-//         up: [0, 33]
-//       };
-//     }
   
-//     forDraw() {
-//       return {
-//         imageId: this.imageId,
-//         drawImageParameters: [
-//           this.imageStartPoints[this.direction][0],
-//           0,
-//           PLAYER_DIM,
-//           PLAYER_DIM,
-//           this.x, //unde se afla acum dx si dy
-//           this.y,
-//           PLAYER_DIM,
-//           PLAYER_DIM
-//         ]
-//       }
-//     }
-//   }
-
-// class Game{
-//     constructor(options){
-//         this.id = options.id
-//         this.players = options.players
-//         this.start();
-//     }
-//     start(){
-//         const that = this; //pt ca era this id mai jos si nu se ref la instanta jocului, ca nu e un arrow function
-//         // aceasta a fost asignata aici si o sa se ref mereu la instanta jocului
-//         setInterval(function () {gameLoop(that.id)}, 1000/60); //fct care se repeta pe sec de x ori, 60 refresh pe sec
-//     //setinterv primeste ca prim param o fct, de aia punem fct anonima in int careia apelam fct gloop
-//     }
-// }
-
-function gameLoop(id){ //pt a tr constat catre utiliz date, gen unde se afla playeru, cate diamante sunt etc
-  const objectsForDraw = [];
-  games[id].players.forEach(function (player) {
-    objectsForDraw.push(player.forDraw());
+    //curs 4
+    socket.on('start-moving-player', function (direction) {//callback cu param directie
+      if (players[socket.id]) { //numai daca E
+        players[socket.id].startMoving(direction); //apeleaza metoda start moving din clasa player
+        // console.log('[MOVE PLAYER]', direction)
+      }
+    })
+  
+    socket.on('stop-moving-player', function (axis) {
+      if (players[socket.id]) {
+        players[socket.id].stopMoving(axis);
+        // console.log('[STOP PLAYER]', axis)
+      }
+    })
+  
+    socket.on('join-game', function (gameId) {
+      console.log(`[SOCKET ${socket.id} JOINED GAME ${gameId}]`);
+      players[socket.id] = new PinkLady({ gameId: gameId, socketId: socket.id  });
+      games[gameId].players.push(players[socket.id]); //add in games playerul creat
+      socket.join(gameId); //add socket in camera respectiva a jocului
+      io.to('menu').emit('remove-game-from-list', gameId); //cand cnv da join se apel remove si se tr id ul
+    })
+  
+    socket.on('disconnect', function () {
+      console.log(`[SOCKET ${socket.id} DISCONNECTED]`);
+      if (players[socket.id]) {
+        const gameId = players[socket.id].gameId;
+        const game = games[gameId];
+        const playersToRemoveIds = game.players.map(function (player) { //map trece prin fiecare element si il modif, dar ramane neschimbat,doar afi
+          return player.socketId;
+        })
+        clearInterval(game.interval);
+        delete games[gameId];
+        playersToRemoveIds.forEach(function (playerToRemoveId) {
+          delete players[playerToRemoveId];
+        })
+        io.to(gameId).emit('game-over', 'A player disconnected');
+      }
+    })
   })
-  io.to(id).emit('game-loop', objectsForDraw);
-}
 
-const chatUsers = {};
-const games = {};
-const players = {};
+  function gameLoop(id) {
+    if (games[id]) {
+      games[id].update();
+      const objectsForDraw = [];
+      games[id].players.forEach(function (player) {
+        objectsForDraw.push(player.forDraw());
+      })
+      io.to(id).emit('game-loop', objectsForDraw);
+    }
+  }
+  
+  const chatUsers = {};
+  const games = {};
+  const players = {};
 
-module.exports.gameLoop = gameLoop;
-
-
+  module.exports.gameLoop = gameLoop;
