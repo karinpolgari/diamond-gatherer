@@ -345,7 +345,6 @@ document.getElementById("create-game-button").addEventListener('click', function
     
     socket.on('game-over', function (reason) {
         console.log('Game Over', reason);
-        
         ctx.font="120px Lucia Console";
         ctx.fillStyle = "pink";
         ctx.textAlign = "center";

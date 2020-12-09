@@ -35,12 +35,7 @@ io.on('connection', function(socket) {
         console.log('[USER JOINED CHAT]', socket.id, userName);
         chatUsers[socket.id] = userName;
         socket.join('chat');
-        // socket.emit('joined-chat'); 
-        // console.log(chatUsers);
-        // chatUsers.update();
-        // users.update();
         io.to('chat').emit('joined-chat', `${chatUsers[socket.id]} joined chat.`);
-        // io.to('chat').emit('show', users );
 
 
     })
@@ -128,7 +123,7 @@ io.on('connection', function(socket) {
       if (players[socket.id]) {
         const gameId = players[socket.id].gameId;
         const game = games[gameId];
-        const playersToRemoveIds = game.players(function (player) { //map trece prin fiecare element si il modif, dar ramane neschimbat,doar afi
+        const playersToRemoveIds = game.players.map(function (player) { //map trece prin fiecare element si il modif, dar ramane neschimbat,doar afi
           return player.socketId;
         })
         clearInterval(game.interval);
